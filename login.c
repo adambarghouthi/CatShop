@@ -69,15 +69,16 @@ void unencode(char *src, char *last, char *dest)
  *++dest = '\0';
 }
 
-//void main(int argc, char* argv[])
 
-int main()
+int main(void)
 {
 
 	//initialize variables to textbox inputs 
 	//use malloc to initialize these 
 
 	long len; 
+
+	char input[200]; //reads from browser (first array that we use)
 
 	char usernameInputted[50]="goon";
 	char pwdInputted[50]="sanam";
@@ -88,7 +89,6 @@ int main()
 	{
 		printf("Logged In User \n");
 		FILE *loggedIn;
-
 		loggedIn=fopen("LoggedIn.csv", "w+");
 
 		//append usernameInputted to LoggedIn.csv
@@ -96,28 +96,53 @@ int main()
 		fprintf(loggedIn, "s", ",");
 		fclose(loggedIn);
 
-		//print catalogue page
+		
 
 		printf("Content-type: text/html\n\n");
-		printf("<html>")
+		//don't have those 3 printf statements <html> <head> <body> in catalogue.hmtl file
+		//TELL ADAM!! & to use Post Method for login.html
+		//build an array
 
-		//print catalogue page
 
+		printf("<html>");
+		printf("<head>");
+		printf("<body>");
 
-		printf("</html>")
+		FILE *catPointer;
+		catPointer=fopen("adamslinktocatalogue.html", "r+");
+
+		char catalogueLine[200]; //will store line from catalogue file
+		while(fgets(catalogueLine, sizeof(CatalogueLine), catPointer))
+		{
+			printf("%s", catalogueLine);
+
+		}
+		
+		printf("<input type=\"hidden\", name=\"username\">"); //apparently he said this in class
+		printf("</form>"); //close form. whoever writes catalogue page shouldn't write this
+
+		printf("</body>");
+		printf("</head>");
+		printf("</html>");
+		
+		fclose(catPointer);
 		return 1;
 	}
 
 	if(x!=1)
 	{
-		//create error page
+		//create error page - COLLABORATE WITH ADAM FOR CONSISTENT FORMATTING
+		//on error page: 2 links
+		//link home and link to login page
 
 		printf("User Not Found \n");
 		printf("Content-type: text/html\n\n");
-		printf("<html>")
+		printf("<html>");
+
+		//write printf html statements here
 
 		
-		printf("</html>'')
+		printf("</html>");
 		return 0;
 		
 	}
