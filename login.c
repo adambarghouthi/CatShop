@@ -13,29 +13,40 @@ int validPair(char username[], char pwd[])
 	FILE *members;
 	members=fopen("Members.csv", "r");
 
-	char currLine[3000]; //represents 1 line of members.csv file
+	char currLine[1000]; //represents 1 line of members file
 	
 	while(fgets(currLine, sizeof(currLine), members))
 	{
 		char *token;
-		token=strtok(currLine, DELIM); //token set to 1st element of the current line of members
-		token=strtok(NULL, DELIM); //token set to 2nd element of currentl ine, so token=username listed in members.csv
+		token=strtok(currLine, DELIM); 
+		token=strtok(NULL, DELIM); //token points to 2nd element of currLine (the username)
 
-		if(strcmp(username,token)==0) //check if valid username, if valid check password:
+		//check if valid username
+
+		if(strcmp(username,token)==0) 
 		{  
-			token=strtok(NULL,DELIM); //make token password stored at current line (3rd entry of currLine)
-			char s[2]="\n";
+			//now check if password is correct
+			token=strtok(NULL,DELIM); //make token point to 3rd entry of currLine (the password)
+			
+			//in csv file (and thus in currLine) the last entry of the line has a \n at the end
+			//so password is stored like this: password\n
+			//we need to do our string comparison for the password without the \n
+
+			char s[2]="\n"; 
 			char *pwdMembers;
-			pwdMembers=strtok(token, s); //to remove the \n from the last word in the current line
-			if(strcmp(pwd, pwdMembers)==0) //check if user enterred right password
+			pwdMembers=strtok(token, s); 
+
+			//if passwords match, then user logged in correctly - return 1. 
+			if(strcmp(pwd, pwdMembers)==0) 
 			{
 				fclose(members); 
-				return 1; //user logged in correctly
+				return 1; 
 			}
 		}
 	}
+
 	fclose(members);
-	return 0; //invalid username password combination enterred
+	return 0; //invalid username password combination entered
 }
 
 //void main(int argc, char* argv[])
