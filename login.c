@@ -65,9 +65,15 @@ int main()
 	{
 		printf("Logged In User \n");
 		FILE *loggedIn;
-		loggedIn=fopen("LoggedIn.csv", "rw");
-		//now to apend usernameInputted to LoggedIn.csv
+
+		loggedIn=fopen("LoggedIn.csv", "w+");
+
+		//append usernameInputted to LoggedIn.csv
+		fprintf(loggedIn, "%s", usernameInputted);
+		fprintf(loggedIn, "s", ",");
+
 		//print catalogue page
+		
 		fclose(loggedIn);
 		return 1;
 	}
