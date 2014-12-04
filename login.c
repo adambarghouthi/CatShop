@@ -29,10 +29,12 @@ int validPair(char username[], char pwd[])
 			pwdMembers=strtok(token, s); //to remove the \n from the last word in the current line
 			if(strcmp(pwd, pwdMembers)==0) //check if user enterred right password
 			{
+				fclose(members); 
 				return 1; //user logged in correctly
 			}
 		}
 	}
+	fclose(members);
 	return 0; //invalid username password combination enterred
 }
 
@@ -43,17 +45,22 @@ int main()
 	//initialize variables to textbox inputs 
 	//use malloc to initialize these 
 
-	char usernameInputted[50]="saghda";
-	char pwdInputted[50]="hello";
+	char usernameInputted[50]="goon";
+	char pwdInputted[50]="sanam";
 
 	int x=validPair(usernameInputted, pwdInputted);
+
 	if(x==1)
 	{
 		printf("Logged In User \n");
-		return 1;
-		//add user to logged in users csv
+		FILE *loggedIn;
+		loggedIn=fopen("LoggedIn.csv", "rw");
+		//now to apend usernameInputted to LoggedIn.csv
 		//print catalogue page
+		fclose(loggedIn);
+		return 1;
 	}
+
 	if(x!=1)
 	{
 		printf("User Not Found \n");
