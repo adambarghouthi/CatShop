@@ -25,8 +25,9 @@ int validPair(char username[], char pwd[])
 		{  
 			token=strtok(NULL,DELIM); //make token password stored at current line (3rd entry of currLine)
 			char s[2]="\n";
+			char *pwdMembers;
 			pwdMembers=strtok(token, s); //to remove the \n from the last word in the current line
-			if(stringcmp(pwd, pwdMembers)==0) //check if user enterred right password
+			if(strcmp(pwd, pwdMembers)==0) //check if user enterred right password
 			{
 				return 1; //user logged in correctly
 			}
@@ -43,7 +44,7 @@ int main()
 	//use malloc to initialize these 
 
 	char usernameInputted[50]="saghda";
-	char pwdMembers[50]="hello";
+	char pwdInputted[50]="hello";
 
 	int x=validPair(usernameInputted, pwdInputted);
 	if(x==1)
