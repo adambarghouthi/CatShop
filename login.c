@@ -49,12 +49,35 @@ int validPair(char username[], char pwd[])
 	return 0; //invalid username password combination entered
 }
 
+
+//to accept input via CGI. POST method
+//from: http://www.cs.tut.fi/~jkorpela/forms/cgic.html 
+
+void unencode(char *src, char *last, char *dest)
+{
+ for(; src != last; src++, dest++)
+   if(*src == '+')
+     *dest = ' ';
+   else if(*src == '%') {
+     int code;
+     if(sscanf(src+1, "%2x", &code) != 1) code = '?';
+     *dest = code;
+     src +=2; }     
+   else
+     *dest = *src;
+ *dest = '\n';
+ *++dest = '\0';
+}
+
 //void main(int argc, char* argv[])
+
 int main()
 {
 
 	//initialize variables to textbox inputs 
 	//use malloc to initialize these 
+
+	long len; 
 
 	char usernameInputted[50]="goon";
 	char pwdInputted[50]="sanam";
@@ -71,18 +94,32 @@ int main()
 		//append usernameInputted to LoggedIn.csv
 		fprintf(loggedIn, "%s", usernameInputted);
 		fprintf(loggedIn, "s", ",");
+		fclose(loggedIn);
 
 		//print catalogue page
-		
-		fclose(loggedIn);
+
+		printf("Content-type: text/html\n\n");
+		printf("<html>")
+
+		//print catalogue page
+
+
+		printf("</html>")
 		return 1;
 	}
 
 	if(x!=1)
 	{
+		//create error page
+
 		printf("User Not Found \n");
+		printf("Content-type: text/html\n\n");
+		printf("<html>")
+
+		
+		printf("</html>'')
 		return 0;
-		//display error page
+		
 	}
 }
 
