@@ -22,8 +22,8 @@ int validPair(char username[], char pwd[])
 	while(fgets(currLine, sizeof(currLine), members))
 	{
 		char *token;
-		token=strtok(currLine, DELIM); 
-		token=strtok(NULL, DELIM); //token points to 2nd element of currLine (the username)
+		token=strtok(currLine, DELIM1); 
+		token=strtok(NULL, DELIM1); //token points to 2nd element of currLine (the username)
 
 		//if username is valid, check password
 
@@ -78,7 +78,7 @@ int main(void)
 	{
 		data[j]=c;
 		c=getchar();
-		j++
+		j++;
 	}
 	data[j]='\0';
 
