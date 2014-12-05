@@ -15,7 +15,7 @@ int validPair(char username[], char pwd[])
 {
 
 	FILE *members;
-	members=fopen("../Members.csv", "rt");
+	members=fopen("../members.csv", "rt");
 
 	char currLine[1000]; //represents 1 line of members file
 	
