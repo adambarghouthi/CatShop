@@ -2,16 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define DELIM ","
+#define DELIM1 ","
+#define DELIM2 "\n"
+#define DELIM3 "&"
+#define DELIM4 "="
 
 
-//method validPair returns 1 if username & password enterred are valid & 0 otherwise
+//function validPair takes in two char arrays & checks if they make valid username pwd pair
+//if valid: appends username to LoggedIn.csv & returns 1. else: return 0
 
 int validPair(char username[], char pwd[])
 {
 
 	FILE *members;
-	members=fopen("Members.csv", "r");
+	members=fopen("../Members.csv", "rt");
 
 	char currLine[1000]; //represents 1 line of members file
 	
@@ -21,24 +25,26 @@ int validPair(char username[], char pwd[])
 		token=strtok(currLine, DELIM); 
 		token=strtok(NULL, DELIM); //token points to 2nd element of currLine (the username)
 
-		//check if valid username
+		//if username is valid, check password
 
 		if(strcmp(username,token)==0) 
 		{  
 			//now check if password is correct
-			token=strtok(NULL,DELIM); //make token point to 3rd entry of currLine (the password)
+			token=strtok(NULL,DELIM1); //make token point to 3rd entry of currLine (the password)
 			
 			//in csv file (and thus in currLine) the last entry of the line has a \n at the end
 			//so password is stored like this: password\n
 			//we need to do our string comparison for the password without the \n
 
-			char s[2]="\n"; 
 			char *pwdMembers;
-			pwdMembers=strtok(token, s); 
+			pwdMembers=strtok(token, DELIM2); 
 
-			//if passwords match, then user logged in correctly - return 1. 
+			//if passwords match, then user logged in correctly, append username to LoggedIn.csv and return 1. 
 			if(strcmp(pwd, pwdMembers)==0) 
 			{
+				FILE *loggedIn;
+				loggedIn=fopen("../LoggedIn.csv", "a");
+				fclose(loggedIn);
 				fclose(members); 
 				return 1; 
 			}
@@ -50,102 +56,81 @@ int validPair(char username[], char pwd[])
 }
 
 
-//to accept input via CGI. POST method
-//from: http://www.cs.tut.fi/~jkorpela/forms/cgic.html 
-
-void unencode(char *src, char *last, char *dest)
-{
- for(; src != last; src++, dest++)
-   if(*src == '+')
-     *dest = ' ';
-   else if(*src == '%') {
-     int code;
-     if(sscanf(src+1, "%2x", &code) != 1) code = '?';
-     *dest = code;
-     src +=2; }     
-   else
-     *dest = *src;
- *dest = '\n';
- *++dest = '\0';
-}
-
-
 int main(void)
 {
+	int length=atoi(getenv("CONTENT_LENGTH"));
 
-	//initialize variables to textbox inputs 
-	//use malloc to initialize these 
+	//create space to store whole string, then space to store the inputted username & passwords
+	char *data=malloc(sizeof(char)*(length+1))); 
+	char *usernameIn=malloc(100*sizeof(char));
+	char *pwdIn=malloc(100*sizeof(char));
 
-	long len; 
+	char *tokenU; //for username partition
+	char *tokenP; //for password partition
+	char *token1;
+	char *token2;
+	int j=0;
+	char c=getchar();
 
-	char input[200]; //reads from browser (first array that we use)
+	//first we read each char into data array & then add null char to end
 
-	char usernameInputted[50]="goon";
-	char pwdInputted[50]="sanam";
+	while(c!=EOF && j<length)
+	{
+		data[j]=c;
+		c=getchar();
+		j++
+	}
+	data[j]='\0';
 
-	int x=validPair(usernameInputted, pwdInputted);
-
+	//data is now int his form: "username=usernameIn&password=pwdIn\0"
+	//tokenize data to separate username and password
+		
+	tokenU=strtok(data,DELIM3); //tokenU points to this "username=usernameIn"
+	tokenP=strtok(NULL,DELIM3); //tokenP points to this "password=pwdInputted"
+	
+	token1=strtok(tokenU,DELIM4); //token1 points to "username"
+	usernameIn=strtok(NULL,DELIM4); //usernameIn points to usernameInputted
+	//printf("%s\n",usernameIn); 
+	
+	token2=strtok(tokenP,DELIM4); //token2 points to "password"
+	pwdIn=strtok(NULL,DELIM4); //this gets pwdIn\0
+	//printf("%s\n",pwdIn);
+	
+	//now that username and password inputted variables are set, we call our validPair function
+	
+	int x=validPair(usernameIn,pwdIn);
+	
+	//should we make these html prints like this:
+	//printf("%s\n\n","Content-type:text/html\n\n");
+	
 	if(x==1)
 	{
-		printf("Logged In User \n");
-		FILE *loggedIn;
-		loggedIn=fopen("LoggedIn.csv", "w+");
-
-		//append usernameInputted to LoggedIn.csv
-		fprintf(loggedIn, "%s", usernameInputted);
-		fprintf(loggedIn, "s", ",");
-		fclose(loggedIn);
-
-		
-
-		printf("Content-type: text/html\n\n");
-		//don't have those 3 printf statements <html> <head> <body> in catalogue.hmtl file
-		//TELL ADAM!! & to use Post Method for login.html
-		//build an array
-
-
+		printf("Content-type:text/html\n\n");
 		printf("<html>");
 		printf("<head>");
 		printf("<body>");
-
-		FILE *catPointer;
-		catPointer=fopen("adamslinktocatalogue.html", "r+");
-
-		char catalogueLine[200]; //will store line from catalogue file
-		while(fgets(catalogueLine, sizeof(CatalogueLine), catPointer))
-		{
-			printf("%s", catalogueLine);
-
-		}
-		
-		printf("<input type=\"hidden\", name=\"username\">"); //apparently he said this in class
-		printf("</form>"); //close form. whoever writes catalogue page shouldn't write this
-
-		printf("</body>");
-		printf("</head>");
-		printf("</html>");
-		
-		fclose(catPointer);
-		return 1;
+		printf("<input type=\"hidden\" name=\"usernameIn\">");//inserts hidden field, assigns usernameIn to field
+		printf("<p>Link to CAT-alogue. Happy shopping!</p>");//display catalogue page instead of this
+	
 	}
-
-	if(x!=1)
+	
+	else
 	{
-		//create error page - COLLABORATE WITH ADAM FOR CONSISTENT FORMATTING
-		//on error page: 2 links
-		//link home and link to login page
-
-		printf("User Not Found \n");
-		printf("Content-type: text/html\n\n");
+		printf("Content-type:text/html\n\n");
 		printf("<html>");
-
-		//write printf html statements here
-
-		
-		printf("</html>");
-		return 0;
-		
+		printf("<head>");
+		printf("<title>The CatShop</title>");
+		printf("<body>");
+		printf("<p>Sorry. The username & password combination you entered is incorrect.</p>");
+		printf("<br>");
+		printf("<p>Link to login, link to home.</p>"); //need these links!
 	}
+	
+	printf("</body>");
+	printf("</head>");
+	printf("</html>");
+	return 0;
+
 }
 
 
